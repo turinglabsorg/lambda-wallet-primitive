@@ -1,0 +1,64 @@
+org: yomieth
+app: general
+service: boilerplate
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  lambdaHashingVersion: '20201221'
+  stage: dev
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt: [WalletsTable, Arn]
+        - Effect: Allow
+          Action:
+            - ssm:GetParametersByPath
+            - ssm:GetParameter
+            - ssm:GetParameters
+          Resource: 
+            - arn:aws:ssm:*:*:parameter/*
+  environment:
+    STAGE: "dev"
+
+functions:
+  api:
+    handler: lambda.handler
+    events: 
+      - http:
+          path: /
+          method: ANY
+      - http:
+          path: /{proxy+}
+          method: ANY
+
+resources:
+  Resources:
+    WalletsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: walletId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: walletId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: dev_WalletsTable
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-typescript
