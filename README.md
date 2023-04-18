@@ -18,6 +18,10 @@ yarn db:migrate:wallets
 yarn dev
 ```
 
+## Test
+
+To test the API use Postman, docs are here: https://documenter.getpostman.com/view/3143294/2s93XzyNji
+
 ## Optional: Backup on AWS
 
 Create an RSA key:
